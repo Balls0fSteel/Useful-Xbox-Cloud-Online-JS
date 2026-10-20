@@ -1,0 +1,20 @@
+{
+  "name": "useful-xbox-cloud-online-js",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tampermonkey userscript that adds review scores, genres and a filterable game finder to Xbox Cloud Gaming (xbox.com/play).",
+  "type": "module",
+  "scripts": {
+    "data": "node scripts/fetch-data.mjs",
+    "data:quick": "node scripts/fetch-data.mjs --skip-steam",
+    "build": "node scripts/build-userscript.mjs",
+    "all": "node scripts/fetch-data.mjs && node scripts/build-userscript.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS.git"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

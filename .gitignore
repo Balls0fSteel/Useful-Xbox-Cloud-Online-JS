@@ -1,0 +1,10 @@
+node_modules/
+.claude/
+
+# Page snapshots saved from xbox.com/play for the local harness; they can contain account details.
+snapshots/
+20[0-9][0-9][0-9][0-9][0-9][0-9]/
+
+*.log
+.DS_Store
+Thumbs.db
