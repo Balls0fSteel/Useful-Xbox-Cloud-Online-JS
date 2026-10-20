@@ -1,9 +1,10 @@
 # PLAN
 
-Last updated: 2026-10-20_230228_1792530148
+Last updated: 2026-10-20_233222_1792531942
 
 ## Current state
 
+- Published: https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS (`main`); raw install/update URLs verified (HTTP 200).
 - v0.1: Tampermonkey userscript with score badges, genre labels, game-page score card, Game Finder panel, optional dimming of low scorers, and live store-rating lookups for games newer than the bundle.
 - Data pipeline (`scripts/fetch-data.mjs`) pulls the full cloud catalog (~3,900 games, US market), Microsoft Store ratings, Steam matches + Metacritic, and batched Steam rating summaries (% positive + count only; no review texts by design).
 - Build (`scripts/build-userscript.mjs`) bundles code and compact data into `dist/xbox-cloud-scores.user.js` (~0.9 MB) plus a `.meta.js` for Tampermonkey update checks.
@@ -15,10 +16,9 @@ Last updated: 2026-10-20_230228_1792530148
 
 ## Next steps
 
-1. Push to GitHub (`main`) so the `@updateURL` / `@downloadURL` raw links work.
-2. GitHub Actions workflow: weekly `npm run all`, commit `data/` + `dist/` when changed (gives automatic updates to every user).
-3. Replace the README screenshots with higher-resolution ones once installed for real (current ones come from the local harness at 800 px).
-4. Review the Steam no-match list for popular games and add `data/overrides.json` entries where the title differs (e.g. "Hellblade II" vs "Senua's Saga: Hellblade II").
+1. GitHub Actions workflow: weekly `npm run all`, commit `data/` + `dist/` when changed (gives automatic updates to every user).
+2. Replace the README screenshots with higher-resolution ones once installed for real (current ones come from the local harness at 800 px).
+3. Review the Steam no-match list for popular games and add `data/overrides.json` entries where the title differs (e.g. "Hellblade II" vs "Senua's Saga: Hellblade II").
 
 ## Future improvements
 

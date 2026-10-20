@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-10-20_233222_1792531942 — published
+
+- Pushed `main` to https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS. Verified the raw `dist/xbox-cloud-scores.user.js` (install) and `.meta.js` (update check) URLs return HTTP 200.
+
 ## 2026-10-20_230228_1792530148 — v0.1 initial release
 
 ### Added
