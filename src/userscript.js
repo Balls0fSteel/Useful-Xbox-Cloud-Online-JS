@@ -526,6 +526,7 @@ input[type=range]{flex:1;accent-color:#107c10}
 .t3{background:#eab308;color:#1a1300}.t4{background:#84cc16;color:#0d1402}.t5{background:#22c55e;color:#03140a}
 .ft{display:flex;align-items:center;gap:10px;padding:8px 16px;border-top:1px solid #27272a;background:#18181b;color:#71717a;font-size:12px;flex-wrap:wrap}
 .ft a{color:#a1a1aa}
+.ft a.don{color:#fda4af;font-weight:700}
 .ft .sp{flex:1}
 .settings{padding:4px 0}
 .filtbtn{display:none}
@@ -598,7 +599,7 @@ const panel = {
    <button class="btn filtbtn" data-act="filters">Filters</button>
    <input class="q" type="search" placeholder="Search title, publisher, developer…" value="${esc(s.q)}" aria-label="Search games">
    <span class="sp"></span>
-   <a class="btn heart" href="${DONATE_URL}" target="_blank" rel="noopener" title="Support the author">♥<span class="lbl"> Support</span></a>
+   <a class="btn heart" href="${DONATE_URL}" target="_blank" rel="noopener" title="Donate to DukeCorp1996, the author of this script">♥<span class="lbl"> Donate</span></a>
    <button class="btn icon" data-act="settings" title="Settings" aria-label="Settings">⚙</button>
    <button class="btn icon" data-act="close" title="Close (Esc)" aria-label="Close">✕</button>
   </div>
@@ -635,8 +636,9 @@ const panel = {
   <div class="ft">
    <span class="note">Score = Metacritic 40% + Steam rating 35% + Microsoft Store rating 25% (missing sources are skipped). Data from ${esc(RAW.builtAt.slice(0, 10))} (${esc(RAW.market)}).</span>
    <span class="sp"></span>
+   <a href="${DONATE_URL}" target="_blank" rel="noopener">© 2026 DukeCorp1996</a>
+   <a class="don" href="${DONATE_URL}" target="_blank" rel="noopener">♥ Donate</a>
    <a href="${REPO_URL}" target="_blank" rel="noopener">GitHub</a>
-   <a href="${DONATE_URL}" target="_blank" rel="noopener">Donate</a>
    <span>Alt+G toggles this panel</span>
   </div>
  </div>

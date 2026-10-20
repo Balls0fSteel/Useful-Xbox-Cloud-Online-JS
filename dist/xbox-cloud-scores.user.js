@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         Xbox Cloud Gaming Scores & Finder
 // @namespace    https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS
-// @version      0.1.20261020.2100
+// @version      0.2.20261020.2100
 // @description  Rating scores, genres and a filterable game finder for Xbox Cloud Gaming (xbox.com/play). Find the good games fast.
-// @author       Balls0fSteel
+// @author       DukeCorp1996 (https://dukecorp1996.x35.in/)
+// @copyright    2026, DukeCorp1996 (https://dukecorp1996.x35.in/)
+// @license      PolyForm-Noncommercial-1.0.0; https://polyformproject.org/licenses/noncommercial/1.0.0
 // @homepageURL  https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS
 // @supportURL   https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS/issues
 // @updateURL    https://raw.githubusercontent.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS/main/dist/xbox-cloud-scores.meta.js
@@ -21,9 +23,16 @@
 // @connect      catalog.gamepass.com
 // ==/UserScript==
 //
+// Required Notice: Copyright 2026 DukeCorp1996 (https://dukecorp1996.x35.in/)
+//
+// Free for noncommercial use under the PolyForm Noncommercial License 1.0.0
+// (https://polyformproject.org/licenses/noncommercial/1.0.0, full text in LICENSE.md in the repo).
+// Commercial use needs separate permission from DukeCorp1996.
+//
+// Like it? Please donate: https://dukecorp1996.x35.in/
+//
 // Data snapshot: 3915 games, built 2026-10-20T21:00:39.167Z for market US (store ratings 3760, Steam 2986, Metacritic 949)
 // Source, data pipeline and issues: https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS
-// Like it? Support the author: https://dukecorp1996.x35.in/
 
 (function () {
   "use strict";
@@ -620,6 +629,7 @@ input[type=range]{flex:1;accent-color:#107c10}
 .t3{background:#eab308;color:#1a1300}.t4{background:#84cc16;color:#0d1402}.t5{background:#22c55e;color:#03140a}
 .ft{display:flex;align-items:center;gap:10px;padding:8px 16px;border-top:1px solid #27272a;background:#18181b;color:#71717a;font-size:12px;flex-wrap:wrap}
 .ft a{color:#a1a1aa}
+.ft a.don{color:#fda4af;font-weight:700}
 .ft .sp{flex:1}
 .settings{padding:4px 0}
 .filtbtn{display:none}
@@ -692,7 +702,7 @@ const panel = {
    <button class="btn filtbtn" data-act="filters">Filters</button>
    <input class="q" type="search" placeholder="Search title, publisher, developer…" value="${esc(s.q)}" aria-label="Search games">
    <span class="sp"></span>
-   <a class="btn heart" href="${DONATE_URL}" target="_blank" rel="noopener" title="Support the author">♥<span class="lbl"> Support</span></a>
+   <a class="btn heart" href="${DONATE_URL}" target="_blank" rel="noopener" title="Donate to DukeCorp1996, the author of this script">♥<span class="lbl"> Donate</span></a>
    <button class="btn icon" data-act="settings" title="Settings" aria-label="Settings">⚙</button>
    <button class="btn icon" data-act="close" title="Close (Esc)" aria-label="Close">✕</button>
   </div>
@@ -729,8 +739,9 @@ const panel = {
   <div class="ft">
    <span class="note">Score = Metacritic 40% + Steam rating 35% + Microsoft Store rating 25% (missing sources are skipped). Data from ${esc(RAW.builtAt.slice(0, 10))} (${esc(RAW.market)}).</span>
    <span class="sp"></span>
+   <a href="${DONATE_URL}" target="_blank" rel="noopener">© 2026 DukeCorp1996</a>
+   <a class="don" href="${DONATE_URL}" target="_blank" rel="noopener">♥ Donate</a>
    <a href="${REPO_URL}" target="_blank" rel="noopener">GitHub</a>
-   <a href="${DONATE_URL}" target="_blank" rel="noopener">Donate</a>
    <span>Alt+G toggles this panel</span>
   </div>
  </div>

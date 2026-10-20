@@ -1,10 +1,10 @@
 # Useful Xbox Cloud Online JS
 
-**Find the good games on Xbox Cloud Gaming, fast.**
+**Find the good games on Xbox Cloud Gaming, fast.** A [DukeCorp1996](https://dukecorp1996.x35.in/) project.
 
 A Tampermonkey userscript for [xbox.com/play](https://www.xbox.com/play) that puts a rating score and genre on every game tile and adds a **Game Finder** panel. Use it to filter the whole cloud catalog (about 3,900 games) by score, genre, Game Pass, free-to-play, touch support, co-op and more.
 
-> ❤️ **Like it? Support the author:** **[dukecorp1996.x35.in](https://dukecorp1996.x35.in/)**. Donations keep the data fresh and the script maintained.
+> ❤️ **Free for personal use. If it helps you, please donate:** **[dukecorp1996.x35.in](https://dukecorp1996.x35.in/)**. Donations keep the scores fresh and the script maintained.
 
 | Score badges + genres on tiles | Game Finder |
 | --- | --- |
@@ -124,14 +124,20 @@ Steam lookups are cached in `data/cache/steam.json`, so later runs only look up 
 
 See [PLAN.md](PLAN.md). Highlights: automatic weekly data refresh via GitHub Actions, more critic sources (OpenCritic / IGDB), a "hide games I've played" list, and an optional browser extension build from the same bundle.
 
-## Support the project
+## Donate
 
-If this saved you from scrolling through 3,900 tiles, consider supporting the author:
+This project is made and maintained by DukeCorp1996 in spare time. Every data refresh means a fresh pass over the catalog, Steam matching and calibration. If the script saved you from scrolling through 3,900 tiles, please consider a donation:
 
 ### 👉 [dukecorp1996.x35.in](https://dukecorp1996.x35.in/)
 
-Bug reports and ideas are welcome in [Issues](https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS/issues).
+The Game Finder has a **♥ Support** button and a footer **Donate** link that go to the same page. Bug reports and ideas are welcome in [Issues](https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS/issues).
+
+## License
+
+Copyright 2026 DukeCorp1996 (<https://dukecorp1996.x35.in/>).
+
+Useful Xbox Cloud Online JS is free for **noncommercial** use under the [PolyForm Noncommercial License 1.0.0](LICENSE.md): personal use, study, hobby projects, and use by charities, schools, research and public institutions. You may share and modify it on the same terms, as long as the `Required Notice` line from [LICENSE.md](LICENSE.md) stays with every copy (it is also in the userscript header). Commercial use needs separate permission from DukeCorp1996. This makes the project source-available rather than open source in the OSI sense.
 
 ## Disclaimer
 
-Not affiliated with, endorsed by, or sponsored by Microsoft, Xbox, Valve/Steam or Metacritic. All trademarks belong to their owners. Scores are computed from public user and critic ratings and are only a guide; your taste may differ.
+Not affiliated with, endorsed by, or sponsored by Microsoft, Xbox, Valve/Steam or Metacritic. Xbox, Xbox Cloud Gaming, Game Pass, Steam and Metacritic are trademarks of their owners and are used only to identify those products and services. Scores are computed from public user and critic ratings and are only a guide; your taste may differ.

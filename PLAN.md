@@ -1,9 +1,10 @@
 # PLAN
 
-Last updated: 2026-10-20_233222_1792531942
+Last updated: 2026-10-20_233432_1792532072
 
 ## Current state
 
+- License: PolyForm Noncommercial 1.0.0, `Required Notice: Copyright 2026 DukeCorp1996 (https://dukecorp1996.x35.in/)`, same as PaTorrent. Commercial use needs DukeCorp1996's permission.
 - Published: https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS (`main`); raw install/update URLs verified (HTTP 200).
 - v0.1: Tampermonkey userscript with score badges, genre labels, game-page score card, Game Finder panel, optional dimming of low scorers, and live store-rating lookups for games newer than the bundle.
 - Data pipeline (`scripts/fetch-data.mjs`) pulls the full cloud catalog (~3,900 games, US market), Microsoft Store ratings, Steam matches + Metacritic, and batched Steam rating summaries (% positive + count only; no review texts by design).
@@ -33,7 +34,6 @@ Last updated: 2026-10-20_233222_1792531942
 
 ## Open questions
 
-- License for the repo (MIT? something else?). No license file is included yet, which means all rights reserved by default.
 - Should the bundled data stay inline in the userscript (current: one-file install, ~0.9 MB), or move to an `@resource` JSON so code and data update separately?
 - Which market(s) should the default build target? Currently US / en-US.
 

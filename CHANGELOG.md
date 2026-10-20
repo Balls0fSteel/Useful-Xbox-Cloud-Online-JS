@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-10-20_233432_1792532072 — v0.2 license, branding, donations
+
+### Added
+- `LICENSE.md`: PolyForm Noncommercial License 1.0.0 with `Required Notice: Copyright 2026 DukeCorp1996 (https://dukecorp1996.x35.in/)`, the same license file as PaTorrent ("no commercial use"; commercial use needs separate permission).
+- DukeCorp1996 branding: userscript `@author`, `@copyright` and `@license` (shown on Tampermonkey's install page) plus the Required Notice line in the script header; package.json `author`, `license`, `funding`.
+- README: "A DukeCorp1996 project" tagline, a License section in the PaTorrent style, a Donate section, and a trademark line for Xbox / Game Pass / Steam / Metacritic in the disclaimer.
+- Finder: header button is now "♥ Donate"; the footer shows "© 2026 DukeCorp1996" and a highlighted "♥ Donate" link, both pointing to https://dukecorp1996.x35.in/.
+
+### Changed
+- Version 0.1 → 0.2, so existing installs update even though the data snapshot is unchanged (the userscript version is `<major>.<minor>.<data date>.<data time>`).
+- `docs/finder.jpg` re-shot to show the Donate button and footer.
+
 ## 2026-10-20_233222_1792531942 — published
 
 - Pushed `main` to https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS. Verified the raw `dist/xbox-cloud-scores.user.js` (install) and `.meta.js` (update check) URLs return HTTP 200.

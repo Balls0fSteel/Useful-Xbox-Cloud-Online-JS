@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds data/games.json: every game playable on Xbox Cloud Gaming (xbox.com/play),
-// with genres, inputs, modes, Microsoft Store user ratings, Steam reviews and Metacritic.
+// with genres, inputs, modes, Microsoft Store user ratings, Steam ratings and Metacritic.
 //
 // Usage:
 //   node scripts/fetch-data.mjs                 full run (Steam lookups are cached and resumable)
