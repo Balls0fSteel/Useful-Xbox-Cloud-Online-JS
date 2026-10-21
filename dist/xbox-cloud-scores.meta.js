@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Xbox Cloud Gaming Scores & Finder
 // @namespace    https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS
-// @version      0.2.20261020.2100
+// @version      0.3.20261021.1845
 // @description  Rating scores, genres and a filterable game finder for Xbox Cloud Gaming (xbox.com/play). Find the good games fast.
 // @author       DukeCorp1996 (https://dukecorp1996.x35.in/)
 // @copyright    2026, DukeCorp1996 (https://dukecorp1996.x35.in/)

@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 2026-10-21_204856_1792608536 — v0.3 Game Pass tiers, Game Pass-only default
+
+### Added
+- **Game Pass tiers.** The data build now requests the Game Pass gallery once per tier (`subscriptionContext` = Essential `CFQ7TTC0K5DJ`, Premium `CFQ7TTC0P85B`, Ultimate `CFQ7TTC0KHS0`; ids and names from the site's bundle) and stores each game's lowest including tier (`gamePassTier`). US counts: Essential 89, Premium 414, Ultimate 562, each a strict subset of the next. Counts are in `meta.gamePassTiers`.
+- Finder: a **Your Game Pass** selector (Essential / Premium / Ultimate, showing each tier's game count; saved in settings). The "In my Game Pass" chip respects it. Cards show ESSENTIAL / PREMIUM / ULTIMATE tags; tiers above yours get an outlined "not in your tier" tag. The game-page card and tile tooltips show the tier too.
+- **Game Pass-only is the default view.** Filters carry a version (`v: 2`); stored v1 filters get Game Pass switched on once.
+
+### Fixed
+- A live lookup finishing while the Finder was open re-rendered the results and jumped back to the top. It now keeps the number of loaded cards and the scroll position.
+- A disconnected IntersectionObserver could be re-armed by the next batch of cards (`this.io` is now cleared).
+- Placeholder release dates (`9998-12-30`, `2799-12-31`; 131 games) showed as years. They are now treated as unknown, in both the build and live lookups.
+- The first migration check read the merged filters (defaults already have `v: 2`), so it never fired. It now checks the stored object.
+
+### Notes
+- Program codes in `XCloudOfferings` (EUROPA / DIA / CALLISTO) look like per-tier codes, but they are on almost every game. They describe streaming rights for owned games, not catalog membership, so the tier comes from the per-tier gallery lists instead.
+- Couldn't reproduce "Game Pass filter shows only 57 games after scrolling". Both programmatic and real mouse-wheel scrolling loaded all 562. Possible causes: a smaller regional catalog, or the scroll-reset bug above.
+- Auto-detecting the viewer's own tier would need authenticated Xbox APIs, so the tier is chosen manually (default Ultimate).
+
 ## 2026-10-20_233432_1792532072 — v0.2 license, branding, donations
 
 ### Added

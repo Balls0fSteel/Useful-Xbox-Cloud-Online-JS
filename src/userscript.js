@@ -10,8 +10,16 @@ const FLAG = { gamePass: 1, byog: 2, f2p: 4, ads: 8, recent: 16, leaving: 32, ad
 const INPUT = { controller: 1, mkb: 2, touch: 4 };
 const MODE = { single: 1, onlineMp: 2, localMp: 4, onlineCoop: 8, localCoop: 16, crossplay: 32 };
 
+// Game Pass tiers, lowest first. A game's `tier` is the cheapest tier that includes it in the cloud.
+const TIERS = [
+  [1, "Essential"],
+  [2, "Premium"],
+  [3, "Ultimate"],
+];
+const TIER_NAME = Object.fromEntries(TIERS);
+
 const AVAIL_CHIPS = [
-  ["gamePass", "Game Pass"],
+  ["gamePass", "In my Game Pass"],
   ["byog", "Buy & stream"],
   ["f2p", "Free to play"],
   ["ads", "Free with ads"],
@@ -73,13 +81,17 @@ const store = {
   },
 };
 
-const DEFAULT_SETTINGS = { badges: true, genreLabels: true, dimBelow: 0, live: true };
+// tier: the viewer's Game Pass (1 Essential, 2 Premium, 3 Ultimate).
+const DEFAULT_SETTINGS = { badges: true, genreLabels: true, dimBelow: 0, live: true, tier: 3 };
+// Bump FILTERS_VERSION when a default changes that existing users should pick up once.
+const FILTERS_VERSION = 2;
 const DEFAULT_FILTERS = {
+  v: FILTERS_VERSION,
   q: "",
   sort: "score",
   minScore: 0,
   minConf: 0,
-  avail: [],
+  avail: ["gamePass"],
   special: [],
   genres: {},
   inputs: [],
@@ -90,7 +102,14 @@ const DEFAULT_FILTERS = {
   hasSteam: false,
 };
 const settings = { ...DEFAULT_SETTINGS, ...store.get("settings", {}) };
-let filters = { ...JSON.parse(JSON.stringify(DEFAULT_FILTERS)), ...store.get("filters", {}) };
+const storedFilters = store.get("filters", null);
+let filters = { ...JSON.parse(JSON.stringify(DEFAULT_FILTERS)), ...(storedFilters || {}) };
+if (storedFilters && (storedFilters.v || 1) < 2) {
+  // v2: Game Pass-only became the default view.
+  if (!filters.avail.includes("gamePass")) filters.avail.push("gamePass");
+  filters.v = FILTERS_VERSION;
+  store.set("filters", filters);
+}
 
 // ---------------------------------------------------------------- data
 
@@ -105,8 +124,12 @@ function normSearch(s) {
     .replace(/[™®©]/g, "");
 }
 
+const MAX_YEAR = new Date().getFullYear() + 2;
+
 function finish(g) {
   g.year = g.release ? Math.floor(g.release / 10000) : null;
+  // Placeholder dates like 9998-12-30 mean "not announced".
+  if (g.year && g.year > MAX_YEAR) g.year = g.release = null;
   g.steamPct = g.steamTotal ? Math.round((g.steamPos / g.steamTotal) * 100) : null;
   g.votes = (g.steamTotal || 0) + (g.storeCount || 0);
   g.hay = normSearch(`${g.title} ${g.publisher} ${g.developer}`);
@@ -136,8 +159,20 @@ const GAMES = RAW.rows.map((r) =>
     meta: r[18] || null,
     score: r[19] < 0 ? null : r[19],
     conf: r[20] || 0,
+    tier: r[21] || 0,
   })
 );
+
+// Cloud games each tier includes, counting the tiers below it.
+const TIER_COUNTS = Object.fromEntries(TIERS.map(([v]) => [v, GAMES.filter((g) => g.tier && g.tier <= v).length]));
+
+function inMyGamePass(g) {
+  return !!g.tier && g.tier <= settings.tier;
+}
+
+function tierLabel(g) {
+  return g.tier ? `Game Pass ${TIER_NAME[g.tier]}${g.tier < 3 ? " and up" : ""}` : "";
+}
 const BY_ID = new Map(GAMES.map((g) => [g.id, g]));
 const ALL_GENRES = (() => {
   const counts = new Map();
@@ -261,7 +296,8 @@ async function flushLive() {
     }
     store.set("live", liveCache);
     scheduleScan(true);
-    if (panel.open) panel.refresh();
+    // Keep the viewer's place: a plain refresh would jump the results back to the top.
+    if (panel.open) panel.refresh({ keep: true });
   } catch (e) {
     console.warn("[xcs] live lookup failed", e);
     for (const id of ids) liveCache[id] = { ts: now - LIVE_TTL + 3600 * 1000, game: null };
@@ -271,7 +307,7 @@ async function flushLive() {
 
 // ---------------------------------------------------------------- formatting
 
-function tier(score) {
+function scoreTier(score) {
   if (score == null) return 0;
   if (score >= 85) return 5;
   if (score >= 75) return 4;
@@ -297,6 +333,7 @@ function breakdown(g) {
 function tooltip(g) {
   const lines = [`${g.title}`, `Score: ${g.score ?? "n/a"}${g.conf <= 1 && g.score != null ? " (thin data)" : ""}`];
   lines.push(...breakdown(g));
+  if (g.tier) lines.push(`${tierLabel(g)}${inMyGamePass(g) ? "" : " (not in your tier)"}`);
   if (g.genres.length) lines.push(g.genres.join(", "));
   return lines.join("\n");
 }
@@ -348,6 +385,7 @@ const PAGE_CSS = `
 .xcs-detail .xcs-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:15px;background:rgba(255,255,255,.1);
   color:#f4f4f5;text-decoration:none;font-weight:600;white-space:nowrap}
 .xcs-detail a.xcs-chip:hover{background:rgba(255,255,255,.2)}
+.xcs-detail .xcs-chip.xcs-gp{background:#107c10;color:#fff}
 .xcs-detail .xcs-note{font-size:12px;color:#a1a1aa;flex-basis:100%}
 #xcs-fab{position:fixed;right:18px;bottom:18px;z-index:2147483000;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border:0;border-radius:22px;
   background:#107c10;color:#fff;font:700 14px/44px "Segoe UI",system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:pointer}
@@ -396,7 +434,7 @@ function decorateTile(a, id) {
     host.appendChild(badge);
   }
   const score = g ? g.score : null;
-  badge.className = `xcs-badge xcs-t${tier(score)}${g && g.conf <= 1 ? " xcs-low" : ""}`;
+  badge.className = `xcs-badge xcs-t${scoreTier(score)}${g && g.conf <= 1 ? " xcs-low" : ""}`;
   badge.textContent = score == null ? "–" : String(score);
   badge.title = g ? tooltip(g) : "No score data yet";
   if (settings.genreLabels && g && g.genres.length) {
@@ -440,7 +478,7 @@ function decorateDetail() {
   const box = document.createElement("div");
   box.className = "xcs-detail";
   box.dataset.id = id;
-  const t = tier(g?.score ?? null);
+  const t = scoreTier(g?.score ?? null);
   const parts = [`<span class="xcs-big xcs-t${t}" title="${esc(g ? tooltip(g) : "No score data yet")}">${g?.score ?? "–"}</span>`];
   if (g) {
     const mcUrl = `https://www.metacritic.com/search/${encodeURIComponent(g.title)}/?category=13`;
@@ -454,6 +492,10 @@ function decorateDetail() {
         `<a class="xcs-chip" href="https://store.steampowered.com/app/${g.steamId}/" target="_blank" rel="noopener">Steam ${g.steamPct}% · ${fmtCount(g.steamTotal)}</a>`
       );
     if (g.storeCount) parts.push(`<span class="xcs-chip">Store ${g.storeRating.toFixed(1)}★ · ${fmtCount(g.storeCount)}</span>`);
+    if (g.tier)
+      parts.push(
+        `<span class="xcs-chip${inMyGamePass(g) ? " xcs-gp" : ""}" title="Lowest Game Pass tier that includes this game in the cloud">${esc(tierLabel(g))}</span>`
+      );
     if (g.conf <= 1) parts.push(`<span class="xcs-note">Thin data: this score is based on few ratings.</span>`);
     if (g.live) parts.push(`<span class="xcs-note">New game: live store rating only, no critic or Steam data yet.</span>`);
   }
@@ -514,7 +556,7 @@ input[type=range]{flex:1;accent-color:#107c10}
 .pill.low{box-shadow:0 0 0 1.5px rgba(255,255,255,.55) inset,0 1px 5px rgba(0,0,0,.6)}
 .tags{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
 .tag{height:18px;padding:0 6px;border-radius:5px;background:rgba(0,0,0,.75);color:#fff;font:700 10px/18px inherit;letter-spacing:.03em}
-.tag.gp{background:#107c10}.tag.free{background:#2563eb}.tag.leave{background:#b91c1c}.tag.new{background:#7c3aed}
+.tag.gp{background:#107c10}.tag.up{background:rgba(0,0,0,.78);color:#9bf00b;box-shadow:inset 0 0 0 1px #107c10}.tag.free{background:#2563eb}.tag.leave{background:#b91c1c}.tag.new{background:#7c3aed}
 .info{padding:8px 9px 10px;display:flex;flex-direction:column;gap:3px;min-height:86px}
 .t{font-weight:700;color:#fff;font-size:13.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .sub{font-size:11.5px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -606,6 +648,10 @@ const panel = {
   <div class="bd">
    <aside class="sd">
     ${this.showSettings ? this.settingsHtml() : ""}
+    <h3>Your Game Pass</h3>
+    <select data-s="tier" aria-label="Your Game Pass tier">${TIERS.map(
+      ([v, name]) => `<option value="${v}"${settings.tier === v ? " selected" : ""}>${name} (${TIER_COUNTS[v]} cloud games)</option>`
+    ).join("")}</select>
     <h3>Availability</h3><div class="chips">${AVAIL_CHIPS.map(([k, l]) => chip("avail", k, l, s.avail.includes(k))).join("")}</div>
     <div class="chips" style="margin-top:6px">${SPECIAL_CHIPS.map(([k, l]) => chip("special", k, l, s.special.includes(k))).join("")}</div>
     <h3>Minimum score</h3>
@@ -693,6 +739,7 @@ const panel = {
         if (v) v.textContent = settings[k] || "Off";
         store.set("settings", settings);
         scheduleScan(true);
+        if (k === "tier") this.refresh();
       });
     });
     r.querySelector(".sd").addEventListener("click", (e) => {
@@ -753,7 +800,10 @@ const panel = {
     const terms = q ? q.split(/\s+/) : [];
     const inc = Object.keys(s.genres).filter((k) => s.genres[k] === 1);
     const exc = Object.keys(s.genres).filter((k) => s.genres[k] === -1);
-    const availMask = s.avail.reduce((m, k) => m | FLAG[k], 0);
+    // Availability chips are OR-ed. "In my Game Pass" depends on the chosen tier, the rest are flags.
+    const wantGamePass = s.avail.includes("gamePass");
+    const availMask = s.avail.reduce((m, k) => (k === "gamePass" ? m : m | FLAG[k]), 0);
+    const anyAvail = wantGamePass || !!availMask;
     const specialMask = s.special.reduce((m, k) => m | FLAG[k], 0);
     const inputMask = s.inputs.reduce((m, k) => m | INPUT[k], 0);
     const modeMask = s.modes.reduce((m, k) => m | MODE[k], 0);
@@ -762,7 +812,7 @@ const panel = {
     const out = [];
     for (const g of BY_ID.values()) {
       if (terms.length && !terms.every((t) => g.hay.includes(t))) continue;
-      if (availMask && !(g.flags & availMask)) continue;
+      if (anyAvail && !((wantGamePass && inMyGamePass(g)) || g.flags & availMask)) continue;
       if (specialMask && !(g.flags & specialMask)) continue;
       if (inputMask && (g.inputs & inputMask) !== inputMask) continue;
       if (modeMask && !(g.modes & modeMask)) continue;
@@ -792,8 +842,12 @@ const panel = {
     return out;
   },
 
-  refresh() {
+  // keep: re-filter but stay where the viewer is (same number of cards, same scroll position).
+  refresh({ keep = false } = {}) {
     if (!this.open || !this.root) return;
+    const prevRes = this.root.querySelector(".res");
+    const keepShown = keep ? this.shown : 0;
+    const keepTop = keep && prevRes ? prevRes.scrollTop : 0;
     this.results = this.filter();
     const total = BY_ID.size;
     const txt = `${this.results.length.toLocaleString()} of ${total.toLocaleString()} games`;
@@ -806,11 +860,14 @@ const panel = {
     res.scrollTop = 0;
     this.shown = 0;
     this.io?.disconnect();
+    this.io = null;
     if (!this.results.length) {
       res.innerHTML = `<div class="empty">No games match these filters.</div>`;
       return;
     }
-    this.renderMore();
+    do this.renderMore();
+    while (this.shown < keepShown && this.shown < this.results.length);
+    res.scrollTop = keepTop;
     this.io = new IntersectionObserver(
       (ents) => {
         if (ents.some((e) => e.isIntersecting)) this.renderMore();
@@ -834,7 +891,11 @@ const panel = {
 
   card(g) {
     const tags = [];
-    if (g.flags & FLAG.gamePass) tags.push(`<span class="tag gp">GAME PASS</span>`);
+    if (g.tier) {
+      const mine = inMyGamePass(g);
+      const name = TIER_NAME[g.tier].toUpperCase();
+      tags.push(`<span class="tag ${mine ? "gp" : "up"}" title="${esc(tierLabel(g))}${mine ? "" : ": not in your tier"}">${name}</span>`);
+    }
     if (g.flags & FLAG.f2p) tags.push(`<span class="tag free">FREE</span>`);
     else if (g.flags & FLAG.ads) tags.push(`<span class="tag free">ADS</span>`);
     if (g.flags & FLAG.leaving) tags.push(`<span class="tag leave">LEAVING</span>`);
@@ -848,7 +909,7 @@ const panel = {
     const sub = [g.year, g.genres.slice(0, 2).join(", ")].filter(Boolean).join(" · ");
     const img = g.image ? `<img loading="lazy" decoding="async" alt="" src="${IMG_BASE}${esc(g.image)}?w=220&format=jpg">` : "";
     return `<a class="card" href="${esc(gamePath(g))}" title="${esc(tooltip(g))}">
-<div class="art">${img}<span class="pill t${tier(g.score)}${g.conf <= 1 && g.score != null ? " low" : ""}">${g.score ?? "–"}</span><div class="tags">${tags.join("")}</div></div>
+<div class="art">${img}<span class="pill t${scoreTier(g.score)}${g.conf <= 1 && g.score != null ? " low" : ""}">${g.score ?? "–"}</span><div class="tags">${tags.join("")}</div></div>
 <div class="info"><div class="t">${esc(g.title)}</div><div class="sub">${esc(sub)}</div><div class="sub">${esc(g.publisher)}</div><div class="subs">${subs.join("")}</div></div></a>`;
   },
 };

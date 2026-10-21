@@ -33,6 +33,8 @@ const S = (s) => {
 };
 
 const FLAG = { gamePass: 1, byog: 2, f2p: 4, ads: 8, recent: 16, leaving: 32, adsOwn: 64 };
+// Lowest Game Pass tier that includes the game in the cloud: 1 Essential, 2 Premium, 3 Ultimate.
+const TIER = { essential: 1, premium: 2, ultimate: 3 };
 const INPUT = { controller: 1, mkb: 2, touch: 4 };
 const MODE = { single: 1, "online-mp": 2, "local-mp": 4, "online-coop": 8, "local-coop": 16, crossplay: 32 };
 
@@ -58,6 +60,7 @@ const rows = games.map((g) => [
   g.metacritic || 0,
   g.score ?? -1,
   g.confidence || 0,
+  TIER[g.gamePassTier] || 0,
 ]);
 
 const data = { v: 1, builtAt: meta.builtAt, market: meta.market, strings, rows };

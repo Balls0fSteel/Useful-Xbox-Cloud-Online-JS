@@ -1,9 +1,10 @@
 # PLAN
 
-Last updated: 2026-10-20_233432_1792532072
+Last updated: 2026-10-21_204856_1792608536
 
 ## Current state
 
+- v0.3: Game Pass tiers (Essential / Premium / Ultimate) in data and Finder; Game Pass-only default view.
 - License: PolyForm Noncommercial 1.0.0, `Required Notice: Copyright 2026 DukeCorp1996 (https://dukecorp1996.x35.in/)`, same as PaTorrent. Commercial use needs DukeCorp1996's permission.
 - Published: https://github.com/Balls0fSteel/Useful-Xbox-Cloud-Online-JS (`main`); raw install/update URLs verified (HTTP 200).
 - v0.1: Tampermonkey userscript with score badges, genre labels, game-page score card, Game Finder panel, optional dimming of low scorers, and live store-rating lookups for games newer than the bundle.
@@ -23,6 +24,7 @@ Last updated: 2026-10-20_233432_1792532072
 
 ## Future improvements
 
+- Live per-market Game Pass tier lists in the userscript (three sigl calls per day for the page's market) instead of the bundled US lists.
 - More critic sources: OpenCritic or IGDB (both need an API key; the build would read it from an env var, never bundle it).
 - HowLongToBeat lengths ("short games under 10h" filter).
 - "Hide played / not interested" list stored per user, plus a "played" checkmark on tiles.
@@ -34,6 +36,7 @@ Last updated: 2026-10-20_233432_1792532072
 
 ## Open questions
 
+- Which market is the user in? If not US, the Game Pass catalog and tier counts differ (one user saw only 57 Game Pass games). Per-market bundles or a live per-market Game Pass list may be needed.
 - Should the bundled data stay inline in the userscript (current: one-file install, ~0.9 MB), or move to an `@resource` JSON so code and data update separately?
 - Which market(s) should the default build target? Currently US / en-US.
 

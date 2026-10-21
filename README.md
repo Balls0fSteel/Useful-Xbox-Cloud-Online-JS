@@ -27,9 +27,10 @@ Xbox Cloud Gaming has thousands of streamable games, but the site gives you almo
 - **Score badges on game tiles**, color-coded from red to green. Hover a badge for the breakdown (Metacritic, Steam %, Microsoft Store stars, vote counts) and genres.
 - **Genre + release year** label on each tile.
 - **Score card on game pages**, with links to the game's Steam page and a Metacritic search.
-- **Game Finder panel** (button at the bottom-right, or <kbd>Alt</kbd>+<kbd>G</kbd>):
+- **Game Finder panel** (button at the bottom-right, or <kbd>Alt</kbd>+<kbd>G</kbd>). It opens on **your Game Pass games** by default:
+  - **your Game Pass tier**: Essential, Premium or Ultimate. "In my Game Pass" shows only the cloud games your tier includes, and every card is tagged with the lowest tier that has it. Games above your tier get an outlined tag, so you can see what an upgrade would add.
   - search by title, publisher or developer
-  - availability: Game Pass, Buy & stream, Free to play, Free with ads (no subscription), Own it & stream with ads
+  - availability: In my Game Pass, Buy & stream, Free to play, Free with ads (no subscription), Own it & stream with ads
   - recently added and leaving soon
   - minimum score, score confidence, "has Metacritic", "has Steam rating"
   - genres: click once to include, again to exclude, a third time to clear
@@ -89,10 +90,13 @@ Sources, all public endpoints that need no API key:
 | What | Where |
 | --- | --- |
 | Cloud catalog lists (All games, Game Pass, Buy & stream, free with ads, recently added, leaving soon, popularity order) | `catalog.gamepass.com/sigls/v3`, the same lists xbox.com/play uses |
+| Which Game Pass tier includes each cloud game | the same Game Pass list, requested once per tier with that tier's subscription id (Essential `CFQ7TTC0K5DJ`, Premium `CFQ7TTC0P85B`, Ultimate `CFQ7TTC0KHS0`) |
 | Titles, genres, publisher, release date, input types, multiplayer modes, images | `catalog.gamepass.com/v3/products` |
 | Microsoft Store star ratings and vote counts | `displaycatalog.mp.microsoft.com/v7.0/products` |
 | Steam app match + Metacritic score | `store.steampowered.com/api/storesearch` |
 | Steam rating summaries: % positive and count, batched (no review texts) | `api.steampowered.com/IStoreBrowseService/GetItems` |
+
+In the US market on 2026-10-21, Game Pass Essential included 89 cloud games, Premium 414 and Ultimate 562. Each tier includes everything in the tiers below it. Catalogs differ by region, and the bundled data is for the US.
 
 Steam lookups are cached in `data/cache/steam.json`, so later runs only look up new or stale games. The first full run takes about 25 minutes, mostly polite rate-limiting toward Steam. Use `--market GB --language en-GB` (for example) to build for another region.
 

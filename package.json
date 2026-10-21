@@ -1,6 +1,6 @@
 {
   "name": "useful-xbox-cloud-online-js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Tampermonkey userscript that adds rating scores, genres and a filterable game finder to Xbox Cloud Gaming (xbox.com/play).",
   "author": "DukeCorp1996 (https://dukecorp1996.x35.in/)",

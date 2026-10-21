@@ -52,6 +52,15 @@ const SIGLS = {
   adsF2p: "d8f4afcd-882a-49e3-86b3-f61fa0172b75",
 };
 
+// The Game Pass gallery returns only the games a subscription includes when asked with that
+// subscription's product id (ids and names from the site's client bundle). Each tier is a subset
+// of the next one up.
+const GAME_PASS_TIERS = [
+  ["essential", "CFQ7TTC0K5DJ"], // Game Pass Essential (formerly Core)
+  ["premium", "CFQ7TTC0P85B"], // Game Pass Premium (formerly Standard)
+  ["ultimate", "CFQ7TTC0KHS0"], // Game Pass Ultimate
+];
+
 const IMAGE_PREFIX = "//store-images.s-microsoft.com/image/";
 
 // ---------------------------------------------------------------- helpers
@@ -127,12 +136,12 @@ function writeJson(file, data, pretty = true) {
 
 // ---------------------------------------------------------------- catalog
 
-async function fetchSigl(id) {
+async function fetchSigl(id, subscriptionContext = "none") {
   const q = new URLSearchParams({
     id,
     market: MARKET,
     language: LANGUAGE,
-    subscriptionContext: "none",
+    subscriptionContext,
     platformContext: "Cloud:XGPUWEB",
   });
   const d = await getJson(`https://catalog.gamepass.com/sigls/v3?${q}`);
@@ -217,6 +226,13 @@ function inputsOf(p) {
   }
   if (!set.size) set.add("controller");
   return ["controller", "mkb", "touch"].filter((x) => set.has(x));
+}
+
+// The catalog uses placeholder dates such as 9998-12-30 and 2799-12-31 for "not announced".
+function releaseDate(iso) {
+  const d = (iso || "").slice(0, 10);
+  const year = Number(d.slice(0, 4));
+  return year >= 1970 && year <= new Date().getUTCFullYear() + 2 ? d : null;
 }
 
 function isF2P(p) {
@@ -415,7 +431,14 @@ async function main() {
     lists[k] = await fetchSigl(id);
     log(`sigl ${k}: ${lists[k].length}`);
   }
+  for (const [tier, sub] of GAME_PASS_TIERS) {
+    lists[`gp_${tier}`] = await fetchSigl(SIGLS.gamePass, sub);
+    log(`sigl gamePass (${tier}): ${lists[`gp_${tier}`].length}`);
+  }
+  lists.gamePass = [...new Set([...lists.gamePass, ...lists.gp_ultimate])];
   const sets = Object.fromEntries(Object.entries(lists).map(([k, v]) => [k, new Set(v)]));
+  // Lowest tier that includes the game in the cloud.
+  const gamePassTier = (id) => GAME_PASS_TIERS.find(([tier]) => sets[`gp_${tier}`].has(id))?.[0] ?? (sets.gamePass.has(id) ? "ultimate" : null);
   const popRank = new Map(lists.popular.map((id, i) => [id, i + 1]));
   const ids = [...new Set([...lists.all, ...lists.byog, ...lists.gamePass, ...lists.adsMain, ...lists.adsByog, ...lists.adsF2p])];
   log(`unique games: ${ids.length}`);
@@ -437,11 +460,12 @@ async function main() {
       publisher: (p.PublisherName || "").trim(),
       developer: (p.DeveloperName || "").trim(),
       genres: [...new Set(p.LocalizedCategories || p.Categories || [])],
-      release: (p.OriginalReleaseDate || "").slice(0, 10) || null,
+      release: releaseDate(p.OriginalReleaseDate),
       age: p.ContentRating?.Age ?? null,
       inputs: inputsOf(p),
       modes: modesOf(p),
       gamePass: sets.gamePass.has(id),
+      gamePassTier: gamePassTier(id),
       byog: sets.byog.has(id),
       f2p: isF2P(p),
       // "Stream for free with ads": free-to-play games that need no subscription.
@@ -495,6 +519,10 @@ async function main() {
     withStore: games.filter((g) => g.store).length,
     withSteam: games.filter((g) => g.steam).length,
     withMetacritic: games.filter((g) => g.metacritic).length,
+    // Cloud games each tier includes (cumulative, a tier includes the ones below it).
+    gamePassTiers: Object.fromEntries(
+      GAME_PASS_TIERS.map(([tier], i) => [tier, games.filter((g) => g.gamePassTier && GAME_PASS_TIERS.findIndex(([t]) => t === g.gamePassTier) <= i).length])
+    ),
   };
   writeJson(OUT, { meta, games });
   log(`wrote ${path.relative(ROOT, OUT)}:`, JSON.stringify(meta));
